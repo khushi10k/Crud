@@ -1,12 +1,15 @@
+import axios from 'axios';
 import React, { useState } from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
-const CreateTaskPopup = ({ modal, toggle, save }) => {
+const CreateTaskPopup = ({ modal, toggle , setTaskList }) => {
     const [name, setName] = useState('');
     const [email , setEmail] = useState('')
     const [contact , setContact] = useState('')
     const [dob, setDob] = useState('');
     const [address , setAddress] = useState('')
+  
+
 
 
     const handleChange = (e) => {
@@ -27,7 +30,7 @@ const CreateTaskPopup = ({ modal, toggle, save }) => {
         
     };
 
-    const handleSave = (e) => {
+    const handleSave =  (e) => {
         e.preventDefault();
 
         const taskObj = {
@@ -37,8 +40,21 @@ const CreateTaskPopup = ({ modal, toggle, save }) => {
             DOB: dob,
             Address: address
         };
-
-        save(taskObj);
+        // await saveTask(taskObj);
+    // toggle();
+    const  postApi = async(taskObj) => {
+            axios
+            .post(`https://crudcrud.com/api/9d88f27eade34992a11c5f7820420adf/users`, taskObj) 
+            .then((response) => {
+              console.log(response.data)
+              setTaskList( response.data);
+            });
+    }
+        postApi(taskObj);
+        toggle();
+        
+    
+        
     };
 
     return (

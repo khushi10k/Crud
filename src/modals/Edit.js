@@ -1,80 +1,86 @@
-import React, { useState } from 'react';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+// import React, { useState , useEffect} from 'react';
+// import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
-const Edit = ({ user, index, update, remove }) => {
-  const [modal, setModal] = useState(false);
-  const [name, setName] = useState(user.Name);
-  const [email, setEmail] = useState(user.Email);
-  const [dob, setDob] = useState(user.DOB);
+// const EditTaskPopup = ({modal, toggle, updateTask, taskObj}) => {
+//   const [name, setName] = useState('');
+//   const [email , setEmail] = useState('')
+//   const [contact , setContact] = useState('')
+//   const [dob, setDob] = useState('');
+//   const [address , setAddress] = useState('')
 
-  const toggle = () => setModal(!modal);
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
 
-  const handleUpdate = () => {
-    const updatedUser = { Name: name, Email: email, DOB: dob };
-    update(index, updatedUser);
-    toggle();
-  };
+//     if (name === "name") {
+//         setName(value);
+//     } else if (name === "email")
+//     {
+//         setEmail(value);
+//     }else if(name === "contact"){
+//         setContact(value)
+//     }else if(name === "dob"){
+//         setDob(value)
+//     }else{
+//         setAddress(value);
+//     }
+    
+// };
 
-  const handleDelete = () => {
-    remove(index);
-    toggle();
-  };
+//     useEffect(() => {
+//         setName(taskObj.name)
+//         setEmail(taskObj.email)
+//         setContact(taskObj.contact)
+//         setDob(taskObj.dob)
+//         setAddress(taskObj.address)
 
-  return (
-    <>
-      <td>{user.Name}</td>
-      <td>{user.Email}</td>
-      <td>{user.DOB}</td>
-      <td>
-        <Button color="primary" onClick={toggle}>
-          Edit
-        </Button>
-        <Button color="danger" onClick={handleDelete}>
-          Delete
-        </Button>
-      </td>
-      <Modal isOpen={modal} toggle={toggle}>
-        <ModalHeader toggle={toggle}>Edit User</ModalHeader>
-        <ModalBody>
-          <div className="form-group">
-            <label>Name</label>
-            <input
-              type="text"
-              className="form-control"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-          <div className="form-group">
-            <label>Email</label>
-            <input
-              type="email"
-              className="form-control"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div className="form-group">
-            <label>DOB</label>
-            <input
-              type="date"
-              className="form-control"
-              value={dob}
-              onChange={(e) => setDob(e.target.value)}
-            />
-          </div>
-        </ModalBody>
-        <ModalFooter>
-          <Button color="primary" onClick={handleUpdate}>
-            Update
-          </Button>
-          <Button color="secondary" onClick={toggle}>
-            Cancel
-          </Button>
-        </ModalFooter>
-      </Modal>
-    </>
-  );
-};
+//     },[])
 
-export default Edit;
+//     const handleUpdate = (e) => {
+//         e.preventDefault();
+//         let tempObj = {}
+//         tempObj['Name'] = name
+//         tempObj['Email'] = email
+//         tempObj['Contact'] = contact
+//         tempObj['DOB'] = dob
+//         tempObj['Address'] = address
+
+//         updateTask(tempObj)
+//         toggle()
+//     }
+
+//     return (
+//       <Modal isOpen={modal} toggle={toggle}>
+//       <ModalHeader toggle={toggle}>Update user</ModalHeader>
+//       <ModalBody>
+//           <div className="form-group">
+//               <label>Name</label>
+//               <input type="text" className="form-control" value={name} onChange={handleChange} name="name" />
+//           </div>
+//           <div className="form-group">
+//               <label>Email</label>
+//               <input type="text" className="form-control" value={email} onChange={handleChange} name="email" />
+//           </div>
+//           <div className="form-group">
+//               <label>Contact</label>
+//               <input type="tel" className="form-control" value={contact} onChange={handleChange} name="contact" />
+//           </div>
+//           <div className="form-group">
+//               <label>DOB</label>
+//               <input type="date" className="form-control" value={dob} onChange={handleChange} name="dob" />
+//           </div>
+//           <div className="form-group">
+//               <label>Address</label>
+//               <textarea name="address" id="" value={address} rows="5" className='form-control' onChange={handleChange}></textarea>
+//           </div>
+        
+
+//       </ModalBody>
+//             <ModalFooter>
+//                 <Button color="primary" onClick={handleUpdate}>Update</Button>{' '}
+//                 <Button color="secondary" onClick={toggle}>Cancel</Button>
+//             </ModalFooter>
+//         </Modal>
+//     );
+// };
+
+// export default EditTaskPopup;

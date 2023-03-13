@@ -3,20 +3,21 @@ import CreateTaskPopup from './Create';
 import { Table } from 'reactstrap';
 import '../App.css';
 import axios from 'axios';
+import { ClapSpinner } from 'react-spinners-kit';
 
 const List = () => {
   const [modal, setModal] = useState(false);
   const [taskList, setTaskList] = useState([]);
-  
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
   const getData = async() => {
-  
-      await axios.get(`https://crudcrud.com/api/9d88f27eade34992a11c5f7820420adf/users`)
+    
+      await axios.get(`https://crudcrud.com/api/6b47a35b18964c09b5b14c377941fbd1/users`)
        .then((response)=>{
          console.log(response.data)
         setTaskList(response.data)
-        
+        setLoading(false);
          return 
        })
      }
@@ -27,7 +28,7 @@ const List = () => {
 
     const deleteApi = async(id) => {
   
-      await axios.delete(`https://crudcrud.com/api/9d88f27eade34992a11c5f7820420adf/users/${id}`)
+      await axios.delete(`https://crudcrud.com/api/6b47a35b18964c09b5b14c377941fbd1/users/${id}`)
        .then((response)=>{
          console.log("data deleted")
          setTaskList(taskList.filter((user)=> user._id !== id))
@@ -81,10 +82,15 @@ const List = () => {
     <>
       <div className="header text-center">
         <h3>Create User</h3>
-        <button className="create-task-button" onClick={() => setModal(true)}>
+        <button className="create-task-button" onClick={() => setModal(true) }>
           Add User
         </button>
       </div>
+      {loading ? (
+        <div className='spinner-container'>
+          <ClapSpinner size={60} color="#007bff" loading={loading} />
+        </div>
+      ) : (
       <Table>
         <thead>
           <tr>
@@ -100,10 +106,12 @@ const List = () => {
           ))}
         </tbody>
       </Table>
-      <CreateTaskPopup toggle={toggle} modal={modal}   />
+      )}
+      <CreateTaskPopup toggle={toggle} modal={modal} setTaskList={setTaskList}  taskList={taskList}   />
     </>
   );
 };
 
 export default List;
 
+// add the loader uptill the data is fetch from api into table till then ClapSpinner is shown from 'react-spinners-kit 

@@ -36,3 +36,14 @@
     transform: rotate(360deg);
   }
 }
+
+.red{
+  color: rgb(173, 59, 59);
+}
+
+.spinner-container{
+  display: flex;
+  justify-content:center;
+  align-items: center;
+  margin-top: 200px;
+}

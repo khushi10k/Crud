@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
-import CreateTaskPopup from "./Create";
-import PopupModal from "./PopupModal";
+import PopupModal, { validationSchema } from "./PopupModal";
 import { Table } from "reactstrap";
 import "../App.css";
 import axios from "axios";
 import { ClapSpinner } from "react-spinners-kit";
+import * as Yup from 'yup';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const List = () => {
   const [modal, setModal] = useState(false);
@@ -12,8 +15,11 @@ const List = () => {
   const [loading, setLoading] = useState(true);
   const [editUser, setEditUser] = useState();
   const [edit, setEdit] = useState(false);
+  const [editName, setEditName] = useState(false);
+  const [editRowId, setEditRowId] = useState(null);
 
   const [formData, setFormData] = useState({
+
     fname: "",
     lname:"" ,
     email: "",
@@ -22,10 +28,20 @@ const List = () => {
     errors: {},
   });
 
+  // const handleNameClick = () => {
+  //   setEditName(true); 
+  // };
+
+  // const handleNameKeyPress = (e) => {
+  //   if (e.key === 'Enter') {
+  //     setEditName(false); 
+  //   }
+  // };
+
   useEffect(() => {
     const getData = async () => {
       await axios
-        .get(`https://crudcrud.com/api/57170e32613f4f6f86f0b858a406af4d/users`)
+        .get(`https://crudcrud.com/api/9a7ba88023a84ec08927c0c5d5d48aa3/users`)
         .then((response) => {
           //  console.log(response.data)
           setTaskList(response.data);
@@ -41,11 +57,12 @@ const List = () => {
   const deleteApi = async (id) => {
     await axios
       .delete(
-        `https://crudcrud.com/api/57170e32613f4f6f86f0b858a406af4d/users/${id}`
+        `https://crudcrud.com/api/9a7ba88023a84ec08927c0c5d5d48aa3/users/${id}`
       )
       .then((response) => {
         //  console.log("data deleted")
         setTaskList(taskList.filter((user) => user._id !== id));
+        toast.success('User deleted successfully'); 
         return;
       });
   };
@@ -62,17 +79,44 @@ const List = () => {
   //   }));
   // };
 
+  // const handleChange = (e) => {
+  //   let name = e.target.name;
+  //   let val = e.target.value;
+  //   setFormData({ ...formData, [name]: val })
+  // }
+
   const handleChange = (e) => {
-    let name = e.target.name;
-    let val = e.target.value;
-    setFormData({ ...formData, [name]: val })
-  }
+    const { name, value } = e.target;
+
+    Yup.reach(validationSchema, name)
+      .validate(value)
+      .then(() => {
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          [name]: value,
+          errors: {
+            ...prevFormData.errors,
+            [name]: undefined, 
+          },
+        }));
+      })
+      .catch((error) => {
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          [name]: value,
+          errors: {
+            ...prevFormData.errors,
+            [name]: error.message, 
+          },
+        }));
+      });
+  };
 
   const postApi = async (taskObj) => {
     console.log('taskObj', taskObj)
     axios
       .post(
-        `https://crudcrud.com/api/57170e32613f4f6f86f0b858a406af4d/users`,
+        `https://crudcrud.com/api/9a7ba88023a84ec08927c0c5d5d48aa3/users`,
         taskObj
       )
       .then((response) => {
@@ -109,19 +153,23 @@ const List = () => {
               contact: formData.contact,
               address: formData.address,
             };
-      let response=await axios.put(`https://crudcrud.com/api/57170e32613f4f6f86f0b858a406af4d/users/${editUser._id}`, userObj);
+      let response=await axios.put(`https://crudcrud.com/api/9a7ba88023a84ec08927c0c5d5d48aa3/users/${editUser._id}`, userObj);
       console.log('response', response)
       const updatedUser = { _id: editUser._id, ...userObj };
       setTaskList(taskList.map((user) => (user._id === editUser._id ? updatedUser : user)));
       setEdit(false);
+      //toast.success('User updated successfully');
     }else{
       postApi(formData);
-    }
+    } 
   };
 
   const toggle = () => {
     setModal(!modal);
-  };
+    if (edit) { 
+      setEdit(!edit);
+    }
+  };
 
   console.log('formData', formData)
   // const saveTask = (taskObj) => {
@@ -134,11 +182,70 @@ const List = () => {
 
   const userColumns = ["Name", "Email", "Contact" , "Address", "Actions"];
 
-  const TableRow = ({ user,setEdit,setModal ,setEditUser}) => {
+  const TableRow = ({ user,setEdit,setModal ,setEditUser , editName}) => {
+    const [name, setName] = useState(`${user.fname} ${user.lname}`);
     // console.log(user,"table")
+    const handleNameChange = (e) => {
+      setName(e.target.value);
+    };
+  
+    const handleNameKeyPress = (e) => {
+      if (e.key === 'Enter') {
+        // setEditName(false);
+        setEditRowId(null);
+
+        try {
+          const updatedUser = {
+            ...user,
+            fname: name.split(' ')[0],
+            lname: name.split(' ')[1],  
+          };
+    
+         
+          axios.put(
+            `https://crudcrud.com/api/9a7ba88023a84ec08927c0c5d5d48aa3/users/${user._id}`,
+            updatedUser,
+            {
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            }
+          );
+    
+          setTaskList((prevTaskList) =>
+            prevTaskList.map((task) =>
+              task._id === user._id ? updatedUser : task
+            )
+          );
+        } catch (error) {
+          console.error('Error updating user:', error);
+        }
+      }
+    };
+
     return (
       <tr>
-        <td>{user.fname}{' '}{user.lname}</td>
+         {/* <td onClick={() =>{
+          setEditName(true);
+          console.log("clickedddd" , editName );
+        }}>{user.fname}{' '}{user.lname}</td> */}
+         {/* {editName ? ( */}
+         {editRowId === user._id ? (
+        <td>
+          <input
+            type="text"
+            value={name}
+            onChange={handleNameChange}
+            onKeyPress={handleNameKeyPress}
+          />
+        </td>
+      ) : (
+        <td onClick={() => {
+          setEditRowId(user._id)
+          console.log('editRowId......', editRowId)
+          console.log('user._id', user._id)
+        }}>{name}</td>
+      )}
         <td>{user.email}</td>
         <td>{user.contact}</td>
         <td>{user.address}</td>
@@ -170,6 +277,7 @@ const List = () => {
 
   return (
     <>
+    <ToastContainer />
       <div className="header text-center">
         <h3>Create User</h3>
         <button className="create-task-button" onClick={() => setModal(true)}>
@@ -192,13 +300,11 @@ const List = () => {
           <tbody>
             {taskList.map((user) => (
               // console.log({user})
-              <TableRow key={user._id} user={user} setEdit={setEdit} setModal={setModal} setEditUser={setEditUser} />
+              <TableRow key={user._id} user={user} setEdit={setEdit} setModal={setModal} setEditUser={setEditUser} editName={editName}  editRowId={editRowId}/>
             ))}
           </tbody>
         </Table>
       )}
-      {/* <CreateTaskPopup toggle={toggle} modal={modal} setTaskList={setTaskList}  taskList={taskList}   /> */}
-      {/* <EditTaskPopup1 toggle={toggle} modal={modal} setTaskList={setTaskList}  taskList={taskList} editUser={editUser}  setEditUser={setEditUser} edit={edit} setEdit={setEdit}/> */}
       <PopupModal
         handleSubmit={handleSubmit}
         modal={modal}
@@ -219,5 +325,4 @@ const List = () => {
 
 export default List;
 
-//edit the code such that add the validations using Formik
 
